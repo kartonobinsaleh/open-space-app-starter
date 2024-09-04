@@ -2,6 +2,7 @@
  * @TODO: Define all the actions (creator) for the talks state
  */
 
+import { hideLoading, showLoading } from "react-redux-loading-bar";
 import api from "../../utils/api";
 
 const ActionType = {
@@ -40,12 +41,14 @@ function toggleLikeTalkActionCreator({ talkId, userId }) {
 
 function asyncAddTalk({ text, replyTo = "" }) {
   return async (dispatch) => {
+    dispatch(showLoading());
     try {
       const talk = await api.createTalk({ text, replyTo });
       dispatch(addTalkActionCreator(talk));
     } catch (error) {
       alert(error.message);
     }
+    dispatch(hideLoading());
   };
 }
 
@@ -54,12 +57,15 @@ function asyncToogleLikeTalk(talkId) {
     const { authUser } = getState();
     dispatch(toggleLikeTalkActionCreator({ talkId, userId: authUser.id }));
 
+    dispatch(showLoading());
+
     try {
       await api.toggleLikeTalk(talkId);
     } catch (error) {
       alert(error.message);
       dispatch(toggleLikeTalkActionCreator({ talkId, userId: authUser.id }));
     }
+    dispatch(hideLoading());
   };
 }
 
